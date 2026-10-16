@@ -1,0 +1,455 @@
+
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vishwakarma Electric & Electrical</title>
+<style>
+:root{--bg:#10131b;--panel:#191e29;--orange:#ff8500;--text:#f5f5f5;--muted:#aeb6c5}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Arial,sans-serif}
+header{background:linear-gradient(120deg,#ff8500,#ff5100);color:#111;padding:24px 14px;text-align:center}
+header h1{margin:0;font-size:25px}
+header p{margin:8px 0 0}
+nav{display:flex;gap:8px;padding:12px;overflow-x:auto;background:#171b24}
+button{border:0;border-radius:9px;padding:11px 14px;font-weight:bold;cursor:pointer}
+nav button{background:#292f3d;color:white;white-space:nowrap}
+nav button.active,.primary{background:var(--orange);color:#111}
+main{max-width:950px;margin:auto;padding:14px}
+.panel{background:var(--panel);padding:17px;border:1px solid #303747;border-radius:14px;margin-bottom:16px}
+h2{font-size:20px;color:var(--orange);margin-top:0}
+h3{font-size:16px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+input,select,textarea{width:100%;padding:12px;background:#10141d;border:1px solid #394253;color:white;border-radius:8px;font-size:15px}
+textarea{resize:vertical}
+.field{min-width:0}
+.full{grid-column:1/-1}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+.secondary{background:#30394a;color:white}
+.danger{background:#b83232;color:white}
+.record{border:1px solid #353d4d;padding:13px;border-radius:10px;margin:10px 0;overflow-wrap:anywhere}
+.record strong{color:var(--orange)}
+.record p{margin:7px 0;font-size:14px}
+.muted{color:var(--muted);font-size:13px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:16px}
+.stat{background:var(--panel);border:1px solid #303747;border-radius:10px;padding:12px;text-align:center}
+.stat b{display:block;color:var(--orange);font-size:22px;margin-bottom:5px}
+.hidden{display:none!important}
+footer{text-align:center;color:var(--muted);padding:20px;font-size:12px}
+@media(max-width:480px){.grid{grid-template-columns:1fr}.full{grid-column:auto}header h1{font-size:22px}.stats{gap:5px}.stat{padding:9px 4px}.stat b{font-size:19px}}
+@media print{
+body{background:white;color:black}
+header{background:white;color:black}
+nav,.no-print,footer,.actions{display:none!important}
+.panel,.record,.stat{background:white;color:black;border:1px solid #aaa;break-inside:avoid}
+input,select,textarea{color:black;background:white}
+h2,.record strong,.stat b{color:black}
+#records{display:block!important}
+}
+</style>
+</head>
+<body>
+<header>
+  <h1>⚡ Vishwakarma Electric & Electrical</h1>
+  <p>Electrical Service • Motor Winding • Data Manager</p>
+</header>
+
+<nav class="no-print">
+  <button class="active" onclick="showPage('home',this)">🏠 Home</button>
+  <button onclick="showPage('items',this)">🔌 Electric Items</button>
+  <button onclick="showPage('winding',this)">🧰 Winding Data</button>
+  <button onclick="showPage('records',this)">📋 All Records</button>
+  <button onclick="showPage('backup',this)">💾 Backup</button>
+</nav>
+
+<main>
+<section id="home">
+  <div class="stats">
+    <div class="stat"><b id="itemCount">0</b>Electric Items</div>
+    <div class="stat"><b id="windCount">0</b>Winding Records</div>
+    <div class="stat"><b id="totalCount">0</b>Total Records</div>
+  </div>
+  <div class="panel">
+    <h2>Welcome 👋</h2>
+    <p>Apni electric items ki list aur motor winding details yahan manage karein.</p>
+    <div class="actions">
+      <button class="primary" onclick="showPage('items')">+ Add Electric Item</button>
+      <button class="secondary" onclick="showPage('winding')">+ Add Winding Data</button>
+    </div>
+  </div>
+  <div class="panel">
+    <h2>Recent Records</h2>
+    <div id="recent"></div>
+  </div>
+</section>
+
+<section id="items" class="hidden">
+  <div class="panel">
+    <h2>🔌 Electric Item Entry</h2>
+    <form id="itemForm">
+      <input type="hidden" id="itemEdit">
+      <div class="grid">
+        <div class="field">
+          <label>Item Category *</label>
+          <select id="itemCategory" required>
+            <option value="Inverter">Inverter</option>
+            <option value="Stabilizer">Stabilizer</option>
+            <option value="Battery">Battery</option>
+            <option value="Charger">Charger</option>
+            <option value="Motor">Motor</option>
+            <option value="Fan">Fan</option>
+            <option value="Pump">Water Pump</option>
+            <option value="Wiring">Wiring Material</option>
+            <option value="Electrical">Other Electric Item</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Item Name *</label>
+          <input id="itemName" required placeholder="Jaise Microtek Inverter">
+        </div>
+        <div class="field">
+          <label>Company / Brand</label>
+          <input id="itemBrand" placeholder="Jaise Microtek, Luminous">
+        </div>
+        <div class="field">
+          <label>Model / Number</label>
+          <input id="itemModel" placeholder="Model number">
+        </div>
+        <div class="field">
+          <label>Quantity</label>
+          <input id="itemQty" type="number" min="0" value="1">
+        </div>
+        <div class="field">
+          <label>Price (₹), if applicable</label>
+          <input id="itemPrice" type="number" min="0" step="0.01" placeholder="0">
+        </div>
+        <div class="field full">
+          <label>Notes / Details</label>
+          <textarea id="itemNotes" rows="2" placeholder="Item ki details, service ya repair notes"></textarea>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="primary" type="submit">💾 Save Item</button>
+        <button class="secondary" type="reset" onclick="clearItem()">Clear</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<section id="winding" class="hidden">
+  <div class="panel">
+    <h2>🧰 Motor Winding Data Entry</h2>
+    <form id="windForm">
+      <input type="hidden" id="windEdit">
+      <div class="grid">
+        <div class="field">
+          <label>Motor Model *</label>
+          <input id="motorModel" required placeholder="Motor model">
+        </div>
+        <div class="field">
+          <label>Owner / Customer Name *</label>
+          <input id="owner" required placeholder="Customer name">
+        </div>
+        <div class="field">
+          <label>HP</label>
+          <input id="hp" placeholder="Jaise 1 HP">
+        </div>
+        <div class="field">
+          <label>Slot</label>
+          <input id="slot" placeholder="Number of slots">
+        </div>
+        <div class="field">
+          <label>Starting Data</label>
+          <input id="startingData" placeholder="Starting turns / data">
+        </div>
+        <div class="field">
+          <label>Running Data</label>
+          <input id="runningData" placeholder="Running turns / data">
+        </div>
+        <div class="field">
+          <label>Starting Gauge</label>
+          <input id="startingGauge" placeholder="Wire gauge">
+        </div>
+        <div class="field">
+          <label>Running Gauge</label>
+          <input id="runningGauge" placeholder="Wire gauge">
+        </div>
+        <div class="field">
+          <label>Stator Size</label>
+          <input id="statorSize" placeholder="Stator size">
+        </div>
+        <div class="field">
+          <label>Winding Material</label>
+          <select id="material">
+            <option value="Copper">Copper (C)</option>
+            <option value="Aluminium">Aluminium (A)</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Price (₹)</label>
+          <input id="windPrice" type="number" min="0" step="0.01" placeholder="Winding charge">
+        </div>
+        <div class="field">
+          <label>Date</label>
+          <input id="windDate" type="date">
+        </div>
+        <div class="field full">
+          <label>Extra Data / Notes</label>
+          <textarea id="windNotes" rows="3" placeholder="Additional winding details"></textarea>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="primary" type="submit">💾 Save Winding Data</button>
+        <button class="secondary" type="reset" onclick="clearWind()">Clear</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<section id="records" class="hidden">
+  <div class="panel">
+    <h2>📋 All Records</h2>
+    <div class="grid no-print">
+      <div class="field">
+        <label>Search by name, model, category</label>
+        <input id="search" placeholder="Search records..." oninput="render()">
+      </div>
+      <div class="field">
+        <label>Record Type</label>
+        <select id="filter" onchange="render()">
+          <option value="all">All Records</option>
+          <option value="item">Electric Items</option>
+          <option value="winding">Winding Data</option>
+        </select>
+      </div>
+    </div>
+    <div class="actions no-print">
+      <button class="secondary" onclick="window.print()">🖨️ Print Records</button>
+    </div>
+    <div id="recordList"></div>
+  </div>
+</section>
+
+<section id="backup" class="hidden">
+  <div class="panel">
+    <h2>💾 Backup & Restore</h2>
+    <p class="muted">Apna data JSON file mein export karein aur baad mein restore karein.</p>
+    <div class="actions">
+      <button class="primary" onclick="backup()">Download JSON Backup</button>
+      <button class="secondary" onclick="document.getElementById('restoreFile').click()">Restore JSON</button>
+      <input id="restoreFile" type="file" accept=".json,application/json" hidden onchange="restore(event)">
+    </div>
+    <p class="muted">Dhyan dein: Restore karne par existing records replace honge.</p>
+  </div>
+</section>
+</main>
+
+<footer>Vishwakarma Electric & Electrical • Data Manager</footer>
+
+<script>
+const KEY = "vishwakarma_electric_manager_v1";
+let db = {items:[], windings:[]};
+
+function load(){
+  try{
+    const saved = JSON.parse(localStorage.getItem(KEY) || "{}");
+    db.items = Array.isArray(saved.items) ? saved.items : [];
+    db.windings = Array.isArray(saved.windings) ? saved.windings : [];
+  }catch(e){db={items:[],windings:[]};}
+}
+function save(){
+  try{
+    localStorage.setItem(KEY,JSON.stringify(db));
+    updateHome();
+  }catch(e){
+    alert("Storage full ya unavailable hai. Turant JSON backup download karein.");
+  }
+}
+function val(id){return document.getElementById(id).value.trim();}
+function set(id,value){document.getElementById(id).value=value??"";}
+function today(){return new Date().toISOString().slice(0,10);}
+
+function showPage(id,btn){
+  document.querySelectorAll("main section").forEach(s=>s.classList.add("hidden"));
+  document.getElementById(id).classList.remove("hidden");
+  document.querySelectorAll("nav button").forEach(b=>b.classList.remove("active"));
+  if(btn)btn.classList.add("active");
+  render();
+}
+function clearItem(){
+  set("itemEdit","");
+  set("itemQty","1");
+}
+function clearWind(){
+  set("windEdit","");
+  set("windDate",today());
+}
+
+document.getElementById("itemForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const id=val("itemEdit");
+  const record={
+    id:id||crypto.randomUUID(),
+    date:today(),
+    category:val("itemCategory"),
+    name:val("itemName"),
+    brand:val("itemBrand"),
+    model:val("itemModel"),
+    qty:val("itemQty"),
+    price:val("itemPrice"),
+    notes:val("itemNotes")
+  };
+  if(id)db.items=db.items.map(x=>x.id===id?record:x);
+  else db.items.unshift(record);
+  save();e.target.reset();clearItem();render();
+  alert("Electric item save ho gaya!");
+});
+
+document.getElementById("windForm").addEventListener("submit",e=>{
+  e.preventDefault();
+  const id=val("windEdit");
+  const record={
+    id:id||crypto.randomUUID(),
+    date:val("windDate")||today(),
+    model:val("motorModel"),
+    owner:val("owner"),
+    hp:val("hp"),
+    slot:val("slot"),
+    starting:val("startingData"),
+    running:val("runningData"),
+    startingGauge:val("startingGauge"),
+    runningGauge:val("runningGauge"),
+    stator:val("statorSize"),
+    material:val("material"),
+    price:val("windPrice"),
+    notes:val("windNotes")
+  };
+  if(id)db.windings=db.windings.map(x=>x.id===id?record:x);
+  else db.windings.unshift(record);
+  save();e.target.reset();clearWind();render();
+  alert("Winding data save ho gaya!");
+});
+
+function esc(s){
+  return String(s??"").replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[c]));
+}
+function money(p){return p!==""&&p!=null?"₹"+esc(p):"Not entered";}
+
+function itemCard(x){
+  return `<div class="record">
+    <strong>🔌 ${esc(x.name)}</strong>
+    <p>Category: ${esc(x.category)} | Brand: ${esc(x.brand||"-")}</p>
+    <p>Model: ${esc(x.model||"-")} | Quantity: ${esc(x.qty||"0")}</p>
+    <p>Price: ${money(x.price)}</p>
+    <p>${esc(x.notes||"")}</p>
+    <p class="muted">Date: ${esc(x.date)}</p>
+    <div class="actions no-print">
+      <button class="secondary" onclick="editItem('${x.id}')">Edit</button>
+      <button class="danger" onclick="delRecord('item','${x.id}')">Delete</button>
+    </div>
+  </div>`;
+}
+function windCard(x){
+  return `<div class="record">
+    <strong>🧰 ${esc(x.model)}</strong>
+    <p>Owner: ${esc(x.owner)} | HP: ${esc(x.hp||"-")} | Slot: ${esc(x.slot||"-")}</p>
+    <p>Starting: ${esc(x.starting||"-")} | Running: ${esc(x.running||"-")}</p>
+    <p>Starting Gauge: ${esc(x.startingGauge||"-")} | Running Gauge: ${esc(x.runningGauge||"-")}</p>
+    <p>Stator: ${esc(x.stator||"-")} | Material: ${esc(x.material||"-")}</p>
+    <p>Price: ${money(x.price)} | Date: ${esc(x.date)}</p>
+    <p>${esc(x.notes||"")}</p>
+    <div class="actions no-print">
+      <button class="secondary" onclick="editWind('${x.id}')">Edit</button>
+      <button class="danger" onclick="delRecord('winding','${x.id}')">Delete</button>
+    </div>
+  </div>`;
+}
+function render(){
+  const q=(document.getElementById("search")?.value||"").toLowerCase();
+  const filter=document.getElementById("filter")?.value||"all";
+  const all=[
+    ...db.items.map(x=>({...x,type:"item"})),
+    ...db.windings.map(x=>({...x,type:"winding"}))
+  ].sort((a,b)=>(b.date||"").localeCompare(a.date||""));
+
+  const matches=all.filter(x=>{
+    const text=JSON.stringify(x).toLowerCase();
+    return text.includes(q)&&(filter==="all"||x.type===filter);
+  });
+  const list=document.getElementById("recordList");
+  if(list)list.innerHTML=matches.length?
+    matches.map(x=>x.type==="item"?itemCard(x):windCard(x)).join(""):
+    '<p class="muted">Koi record nahi mila.</p>';
+
+  const recent=document.getElementById("recent");
+  if(recent){
+    const latest=all.slice(0,5);
+    recent.innerHTML=latest.length?
+      latest.map(x=>x.type==="item"?itemCard(x):windCard(x)).join(""):
+      '<p class="muted">Abhi koi record save nahi hai.</p>';
+  }
+  updateHome();
+}
+function updateHome(){
+  document.getElementById("itemCount").textContent=db.items.length;
+  document.getElementById("windCount").textContent=db.windings.length;
+  document.getElementById("totalCount").textContent=db.items.length+db.windings.length;
+}
+function editItem(id){
+  const x=db.items.find(a=>a.id===id);if(!x)return;
+  showPage("items");
+  ["itemEdit","itemCategory","itemName","itemBrand","itemModel","itemQty","itemPrice","itemNotes"]
+  .forEach((k,i)=>set(k,[x.id,x.category,x.name,x.brand,x.model,x.qty,x.price,x.notes][i]));
+  window.scrollTo(0,0);
+}
+function editWind(id){
+  const x=db.windings.find(a=>a.id===id);if(!x)return;
+  showPage("winding");
+  const ids=["windEdit","motorModel","owner","hp","slot","startingData","runningData",
+    "startingGauge","runningGauge","statorSize","material","windPrice","windDate","windNotes"];
+  const vals=[x.id,x.model,x.owner,x.hp,x.slot,x.starting,x.running,
+    x.startingGauge,x.runningGauge,x.stator,x.material,x.price,x.date,x.notes];
+  ids.forEach((k,i)=>set(k,vals[i]));
+  window.scrollTo(0,0);
+}
+function delRecord(type,id){
+  if(!confirm("Kya aap is record ko delete karna chahte hain?"))return;
+  if(type==="item")db.items=db.items.filter(x=>x.id!==id);
+  else db.windings=db.windings.filter(x=>x.id!==id);
+  save();render();
+}
+function backup(){
+  const blob=new Blob([JSON.stringify(db,null,2)],{type:"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;a.download="Vishwakarma-Backup-"+today()+".json";
+  a.click();URL.revokeObjectURL(url);
+}
+function restore(event){
+  const file=event.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+    try{
+      const data=JSON.parse(reader.result);
+      if(!data||!Array.isArray(data.items)||!Array.isArray(data.windings))
+        throw Error("Invalid backup");
+      if(!confirm("Existing data replace ho jayega. Continue?"))return;
+      db={items:data.items,windings:data.windings};
+      save();render();alert("Backup restore ho gaya!");
+    }catch(e){alert("Invalid JSON backup file!");}
+    finally{event.target.value="";}
+  };
+  reader.readAsText(file);
+}
+
+load();
+set("windDate",today());
+render();
+</script>
+</body>
+</html>
